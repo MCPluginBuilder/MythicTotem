@@ -6,7 +6,6 @@ import cn.superiormc.mythictotem.managers.LanguageManager;
 import dev.lone.itemsadder.api.CustomBlock;
 import io.lumine.mythic.bukkit.BukkitAdapter;
 import io.lumine.mythic.bukkit.MythicBukkit;
-import io.lumine.xikage.mythicmobs.MythicMobs;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -84,12 +83,16 @@ public class CommonUtil {
         }
     }
 
+    public static boolean getYearVersion(int year, int majorVersion, int minorVersion) {
+        return MythicTotem.yearVersion > year || (MythicTotem.yearVersion == year && MythicTotem.majorVersion >= majorVersion && MythicTotem.minorVersion >= minorVersion);
+    }
+
     public static boolean getMajorVersion(int version) {
-        return MythicTotem.majorVersion >= version;
+        return MythicTotem.yearVersion > 1 || MythicTotem.majorVersion >= version;
     }
 
     public static boolean getMinorVersion(int majorVersion, int minorVersion) {
-        return MythicTotem.majorVersion > majorVersion || (MythicTotem.majorVersion == majorVersion &&
+        return MythicTotem.yearVersion > 1 || MythicTotem.majorVersion > majorVersion || (MythicTotem.majorVersion == majorVersion &&
                 MythicTotem.minorVersion >= minorVersion);
     }
 
@@ -125,14 +128,7 @@ public class CommonUtil {
         if (!CommonUtil.checkPluginLoad("MythicMobs")) {
             return;
         }
-        try {
-            MythicBukkit.inst().getMobManager().getMythicMob(mobID).ifPresent(mob -> mob.spawn(BukkitAdapter.adapt(location), level));
-        } catch (NoClassDefFoundError ep) {
-            io.lumine.xikage.mythicmobs.mobs.MythicMob mob = MythicMobs.inst().getMobManager().getMythicMob(mobID);
-            if (mob != null) {
-                mob.spawn(io.lumine.xikage.mythicmobs.adapters.bukkit.BukkitAdapter.adapt(location), level);
-            }
-        }
+        MythicBukkit.inst().getMobManager().getMythicMob(mobID).ifPresent(mob -> mob.spawn(BukkitAdapter.adapt(location), level));
     }
 
     public static void removeBlock(Block block) {

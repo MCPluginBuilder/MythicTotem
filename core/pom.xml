@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>cn.superiormc</groupId>
+        <groupId>cn.superiormc.mythictotem</groupId>
         <artifactId>MythicTotem</artifactId>
-        <version>4.4.5</version>
+        <version>4.4.6</version>
     </parent>
 
     <artifactId>core</artifactId>
@@ -15,7 +15,7 @@
     <name>MythicTotem</name>
 
     <properties>
-        <java.version>17</java.version>
+        <java.version>16</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -138,8 +138,14 @@
         <dependency>
             <groupId>com.github.Emibergo02</groupId>
             <artifactId>RedisEconomy</artifactId>
-            <version>main-370fa8da6d-1</version>
+            <version>4.3.19</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>me.soknight</groupId>
@@ -182,12 +188,6 @@
                     <artifactId>*</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.lumine.xikage</groupId>
-            <artifactId>MythicMobs</artifactId>
-            <version>4.11.0</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.lumine</groupId>
@@ -246,11 +246,10 @@
             <systemPath>${project.basedir}/lib/ExecutableItems-7.24.7.9.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>cn.superiormc</groupId>
-            <artifactId>MythicChanger</artifactId>
-            <version>2.8.5</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/MythicChanger-2.8.5.jar</systemPath>
+            <groupId>cn.superiormc.mythicchanger</groupId>
+            <artifactId>plugin</artifactId>
+            <version>3.0.7</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.qKing12</groupId>
