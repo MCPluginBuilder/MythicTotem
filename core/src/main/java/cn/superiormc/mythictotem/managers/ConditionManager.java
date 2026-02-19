@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.managers;
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
 import cn.superiormc.mythictotem.objects.conditions.*;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -39,10 +37,10 @@ public class ConditionManager {
         }
     }
 
-    public boolean checkBoolean(ObjectSingleCondition condition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public boolean checkBoolean(ObjectSingleCondition condition, Player player, AbstractThingData thingData) {
         for (AbstractCheckCondition checkCondition : conditions.values()) {
             String type = condition.getString("type");
-            if (checkCondition.getType().equals(type) && !checkCondition.checkCondition(condition, player, startLocation, check, totem)) {
+            if (checkCondition.getType().equals(type) && !checkCondition.checkCondition(condition, player, thingData)) {
                 return false;
             }
         }

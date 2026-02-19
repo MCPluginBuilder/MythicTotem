@@ -1,15 +1,23 @@
 package cn.superiormc.mythictotem.objects;
 
 import cn.superiormc.mythictotem.MythicTotem;
+import cn.superiormc.mythictotem.libreforge.LibreforgeEffects;
+import cn.superiormc.mythictotem.managers.BonusEffectsManager;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.managers.ErrorManager;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.effect.AbstractEffect;
+import cn.superiormc.mythictotem.objects.effect.EffectStatus;
+import cn.superiormc.mythictotem.objects.effect.EffectUtil;
+import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import cn.superiormc.mythictotem.utils.TextUtil;
-import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.util.*;
+
 public class ObjectTotem {
 
     // 图腾的行和列
@@ -27,15 +35,25 @@ public class ObjectTotem {
 
     private final ObjectCondition totemCondition;
 
+    private ObjectAction bonusEffectApplyActions;
+
+    private ObjectAction bonusEffectRemoveActions;
+
+    private ObjectAction bonusEffectCircleActions;
+
     private final List<String> totemCoreBlocks;
 
     private final boolean totemDisappear;
+
+    private final boolean totemBonusEffects;
 
     private final String totemCheckMode;
 
     private final ConfigurationSection totemSection;
     
     private final String totemID;
+
+    private final Map<UUID, EffectStatus> mmoEffects = new HashMap<>();
 
     public ObjectTotem(String id, YamlConfiguration section) {
         this.totemID = id;
@@ -44,6 +62,12 @@ public class ObjectTotem {
         this.totemCondition = new ObjectCondition(section.getConfigurationSection("conditions"));
         this.totemCheckMode = section.getString("mode", "VERTICAL").toUpperCase();
         this.totemCoreBlocks = section.getStringList("core-blocks");
+        this.totemBonusEffects = section.getBoolean("bonus-effects.enabled");
+        if (totemBonusEffects) {
+            this.bonusEffectApplyActions = new ObjectAction(section.getConfigurationSection("bonus-effects.apply-actions"));
+            this.bonusEffectRemoveActions = new ObjectAction(section.getConfigurationSection("bonus-effects.remove-actions"));
+            this.bonusEffectCircleActions = new ObjectAction(section.getConfigurationSection("bonus-effects.circle-actions"));
+        }
         this.totemSection = section;
         ConfigurationSection totemLayoutsExplainConfig = section.getConfigurationSection("explains");
         if (totemLayoutsExplainConfig == null) {
@@ -83,7 +107,7 @@ public class ObjectTotem {
                     break;
                 }
             }
-            for (int i = 1 ; i <= totemLayouts.keySet().size(); i++) {
+            for (int i = 1; i <= totemLayouts.size(); i++) {
                 this.totemRow = 0;
                 for (String s : totemLayouts.get(i)) {
                     for (this.totemColumn = 0; this.totemColumn < s.length(); this.totemColumn++) {
@@ -112,8 +136,7 @@ public class ObjectTotem {
             }
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §fLoaded 3D Totem: §e" + totemID +
                     " §fwith size: " + totemRow + "x" + totemColumn);
-        }
-        else {
+        } else {
             List<String> totemLayout = section.getStringList("layout");
             this.totemRow = 0;
             for (String s : totemLayout){
@@ -138,6 +161,15 @@ public class ObjectTotem {
             this.totemLayer = 1;
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §fLoaded 2D Totem: §e" + totemID +
                     " §fwith size: " + totemRow + "x" + totemColumn);
+        }
+        initEffects();
+    }
+
+    public void initEffects() {
+        if (totemSection.getBoolean("bonus-effects.enabled", false) && totemSection.getBoolean("bonus-effects.effects.enabled", false)) {
+            if (ConfigManager.configManager.getBoolean("libreforge-hook", false)) {
+                LibreforgeEffects.libreforgeEffects.registerLibreforgeEffect(totemID);
+            }
         }
     }
 
@@ -187,5 +219,62 @@ public class ObjectTotem {
     
     public String getTotemID() {
         return totemID;
+    }
+
+    public void addBonusEffects(Block block, boolean isCore, UUID uuid) {
+        if (!totemSection.getBoolean("bonus-effects.enabled", false)) {
+            return;
+        }
+        if (this.totemDisappear) {
+            ErrorManager.errorManager.sendErrorMessage("§cError: Bonus effects cannot active when your totem config " + totemID + ".yml setting disappear option to true!");
+            return;
+        }
+
+        BonusEffectsManager.manager.addBonusEffectBlock(block, totemSection.getInt("bonus-effects.default-level", 1), totemID, isCore, uuid);
+    }
+
+    public double getBonusEffectsRange(BonusTotemData data) {
+        double levelRange = totemSection.getDouble("bonus-effects.range." + data.level, -1.0);
+        if (levelRange < 0) {
+            double maxRange = totemSection.getDouble("bonus-effects.range.max", -1.0);
+            if (maxRange < 0) {
+                return totemSection.getDouble("bonus-effects.range", 10.0);
+            }
+            return maxRange;
+        }
+        return levelRange;
+    }
+
+    public boolean isBonusEffectsEnabled() {
+        return totemBonusEffects;
+    }
+
+    public boolean checkAllBlocksAfterActive() {
+        return totemDisappear || totemBonusEffects;
+    }
+
+    public void runBonusEffectsApplyActions(Player player, BonusTotemData data) {
+        if (totemSection.getBoolean("bonus-effects.effects.enabled", false)) {
+            TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §fStarted effect for player " + player.getName());
+            mmoEffects.put(player.getUniqueId(), EffectUtil.startEffect(this, player, data));
+        }
+        bonusEffectApplyActions.runAllActions(player, data);
+    }
+
+    public void runBonusEffectsCircleActions(Player player, BonusTotemData data) {
+        if (mmoEffects.get(player.getUniqueId()) != null) {
+            mmoEffects.get(player.getUniqueId()).retryActiveEffects(data);
+        }
+        bonusEffectCircleActions.runAllActions(player, data);
+    }
+
+    public void runBonusEffectsRemoveActions(Player player, BonusTotemData data) {
+        if (mmoEffects.get(player.getUniqueId()) != null) {
+            for (AbstractEffect tempVal1 : mmoEffects.get(player.getUniqueId()).getActivedEffects()) {
+                tempVal1.removePlayerStat();
+            }
+            mmoEffects.remove(player.getUniqueId());
+        }
+        bonusEffectRemoveActions.runAllActions(player, data);
     }
 }

@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects.actions;
 
 import cn.superiormc.mythictotem.MythicTotem;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public class ActionTitle extends AbstractRunAction {
@@ -14,10 +12,10 @@ public class ActionTitle extends AbstractRunAction {
     }
 
     @Override
-    protected void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
         MythicTotem.methodUtil.sendTitle(player,
-                singleAction.getString("main-title", player, startLocation, check, totem),
-                singleAction.getString("sub-title", player, startLocation, check, totem),
+                singleAction.getString("main-title", player, thingData),
+                singleAction.getString("sub-title", player, thingData),
                 singleAction.getInt("fade-in"),
                 singleAction.getInt("stay"),
                 singleAction.getInt("fade-out"));

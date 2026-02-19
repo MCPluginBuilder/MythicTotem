@@ -1,7 +1,8 @@
 package cn.superiormc.mythictotem.objects.conditions;
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
+import cn.superiormc.mythictotem.objects.singlethings.TotemActiveData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -14,10 +15,21 @@ public class ConditionWorld extends AbstractCheckCondition {
     }
 
     @Override
-    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player,  AbstractThingData thingData) {
+        Location location = null;
         if (player == null || singleCondition.getBoolean("block-as-trigger", false)) {
-            return check.getBlock().getWorld().getName().equals(singleCondition.getString("world"));
+            if (thingData instanceof TotemActiveData totemActiveData) {
+                location = totemActiveData.check.getBlock().getLocation();
+            } else if (thingData instanceof BonusTotemData bonusTotemData) {
+                location = bonusTotemData.location;
+            }
         }
-        return player.getWorld().getName().equals(singleCondition.getString("world", player, startLocation, check, totem));
+        if (location != null) {
+            if (player == null || singleCondition.getBoolean("block-as-trigger", false)) {
+                return location.getWorld().getName().equals(singleCondition.getString("world"));
+            }
+            return false;
+        }
+        return player.getWorld().getName().equals(singleCondition.getString("world", player, thingData));
     }
 }

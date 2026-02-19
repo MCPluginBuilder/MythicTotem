@@ -3,6 +3,8 @@ package cn.superiormc.mythictotem.objects;
 import cn.superiormc.mythictotem.objects.actions.ObjectSingleAction;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
+import cn.superiormc.mythictotem.objects.singlethings.TotemActiveData;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -46,16 +48,16 @@ public class ObjectAction {
         this.isEmpty = everyActions.isEmpty();
     }
 
-    public void runAllActions(Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public void runAllActions(Player player, AbstractThingData thingData) {
         for (ObjectSingleAction singleAction : everyActions) {
-            singleAction.doAction(player, startLocation, check, totem);
+            singleAction.doAction(player, thingData);
         }
     }
 
-    public void runRandomEveryActions(Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem, int x) {
+    public void runRandomEveryActions(Player player, AbstractThingData thingData, int x) {
         Collections.shuffle(everyActions);  // 随机打乱动作顺序
         for (int i = 0; i < Math.min(x, everyActions.size()); i++) {
-            everyActions.get(i).doAction(player, startLocation, check, totem);  // 执行 x 个随机动作
+            everyActions.get(i).doAction(player, thingData);  // 执行 x 个随机动作
         }
     }
 

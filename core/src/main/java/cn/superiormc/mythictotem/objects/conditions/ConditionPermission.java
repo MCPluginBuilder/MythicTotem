@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects.conditions;
 
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public class ConditionPermission extends AbstractCheckCondition {
@@ -14,7 +12,7 @@ public class ConditionPermission extends AbstractCheckCondition {
     }
 
     @Override
-    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, AbstractThingData thingData) {
         return player.hasPermission(singleCondition.getString("permission"));
     }
 }

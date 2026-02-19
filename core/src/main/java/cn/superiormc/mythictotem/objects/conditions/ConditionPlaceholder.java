@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects.conditions;
 
 import cn.superiormc.mythictotem.managers.ErrorManager;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public class ConditionPlaceholder extends AbstractCheckCondition {
@@ -14,9 +12,9 @@ public class ConditionPlaceholder extends AbstractCheckCondition {
     }
 
     @Override
-    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
-        String placeholder = singleCondition.getString("placeholder", player, startLocation, check, totem);
-        String value = singleCondition.getString("value", player, startLocation, check, totem);
+    protected boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player,  AbstractThingData thingData) {
+        String placeholder = singleCondition.getString("placeholder", player, thingData);
+        String value = singleCondition.getString("value", player, thingData);
         try {
             switch (singleCondition.getString("rule")) {
                 case ">=":

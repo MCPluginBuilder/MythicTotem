@@ -2,9 +2,7 @@ package cn.superiormc.mythictotem.objects.actions;
 
 
 import cn.superiormc.mythictotem.managers.ErrorManager;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public abstract class AbstractRunAction {
@@ -27,7 +25,7 @@ public abstract class AbstractRunAction {
         this.requirePlayer = b;
     }
 
-    public void runAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public void runAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
         if (player == null && requirePlayer) {
             return;
         }
@@ -39,10 +37,10 @@ public abstract class AbstractRunAction {
                 }
             }
         }
-        onDoAction(singleAction, player, startLocation, check, totem);
+        onDoAction(singleAction, player, thingData);
     }
 
-    protected abstract void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem);
+    protected abstract void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData);
 
     public String getType() {
         return type;

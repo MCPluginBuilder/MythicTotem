@@ -56,3 +56,27 @@ trigger:
   # Premium version only.
   BlockPistonEvent:
     enabled: false
+
+math:
+  enabled: false
+
+bonus-effects:
+  enabled: true
+  check-radius: 10
+  range-display:
+    enabled: true
+    particle: END_ROD
+
+libreforge-hook: false
+libreforge-effects:
+  - id: example
+    effects:
+      - id: bonus_health
+        args:
+          health: 40
+      - id: damage_multiplier
+        args:
+          multiplier: 4.0
+        triggers:
+          - melee_attack
+    conditions: []

@@ -1,0 +1,65 @@
+package cn.superiormc.mythictotem.objects.effect;
+
+import cn.superiormc.mythictotem.managers.ErrorManager;
+import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
+import cn.superiormc.mythictotem.utils.SchedulerUtil;
+import io.lumine.mythic.lib.api.player.MMOPlayerData;
+import io.lumine.mythic.lib.api.stat.StatMap;
+import io.lumine.mythic.lib.api.stat.modifier.StatModifier;
+import io.lumine.mythic.lib.player.modifier.ModifierType;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+
+public class ObjectMMOEffect extends AbstractEffect {
+
+    private final StatModifier modifier;
+
+    private final String stat;
+
+    public ObjectMMOEffect(String id, Player player, ConfigurationSection section, BonusTotemData data) {
+        super(id, player, section, data);
+        this.player = player;
+        this.stat = section.getString("stat", "");
+        this.modifier = new StatModifier("MythicTotem_" + id, stat, getDouble("value", player, data), ModifierType.FLAT);
+    }
+
+    @Override
+    public void addPlayerStat() {
+        try {
+            if (MMOPlayerData.has(player)) {
+                MMOPlayerData playerData = MMOPlayerData.get(player);
+                StatMap statMap = playerData.getStatMap();
+                modifier.register(playerData);
+                statMap.getInstance(stat).addModifier(modifier);
+            } else {
+                retryTimes ++;
+                if (retryTimes < 3) {
+                    ErrorManager.errorManager.sendErrorMessage("§6Warning: Failed to add MMO effect for player " + player.getName() + "," +
+                        " don't worry, we will retry later. Retry Times: " + retryTimes + ".");
+                    SchedulerUtil.runTaskLater(this::addPlayerStat, 20L);
+                } else {
+                    ErrorManager.errorManager.sendErrorMessage("§cError: Failed to add MMO effect for player " + player.getName() + "," +
+                            " if this always happen, try change cache.load-mode option to JOIN in config.yml file, if it only happens sometimes, just ignore this and ask" +
+                            " this player equip the prefix again! This because MMO load data is slower than MythicTotem this times.");
+                }
+            }
+        } catch (Throwable throwable) {
+            ErrorManager.errorManager.sendErrorMessage("§cError: Failed to add MMO effect for player " + player.getName() + "," +
+                    " if this always happen, try change cache.load-mode option to JOIN in config.yml file, if it only happens sometimes, just ignore this and ask" +
+                    " this player equip the prefix again! This because MMO load data is slower than MythicTotem this times.");
+        }
+    }
+
+    public void removePlayerStat() {
+        retryTimes = 0;
+        if (retryTask != null) {
+            retryTask.cancel();
+            retryTask = null;
+        }
+        if (player.isOnline()) {
+          MMOPlayerData playerData = MMOPlayerData.get(player);
+          StatMap statMap = playerData.getStatMap();
+          statMap.getInstance(stat).remove("MythicTotem_" + id);
+        }
+    }
+}

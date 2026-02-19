@@ -1,7 +1,6 @@
 package cn.superiormc.mythictotem.objects.actions;
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -13,7 +12,7 @@ public class ActionSound extends AbstractRunAction {
     }
 
     @Override
-    protected void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
         String soundName = singleAction.getString("sound");
         float volume = 1.0f;
         float pitch = 1.0f;

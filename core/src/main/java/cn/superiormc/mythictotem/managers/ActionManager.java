@@ -4,6 +4,7 @@ package cn.superiormc.mythictotem.managers;
 import cn.superiormc.mythictotem.objects.actions.*;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -40,6 +41,7 @@ public class ActionManager {
         registerNewAction("any", new ActionAny());
         registerNewAction("mythicmobs_spawn", new ActionMythicMobsSpawn());
         registerNewAction("conditional", new ActionConditional());
+        registerNewAction("give_item", new ActionGiveItem());
     }
 
     public void registerNewAction(String actionID,
@@ -49,11 +51,11 @@ public class ActionManager {
         }
     }
 
-    public void doAction(ObjectSingleAction action, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public void doAction(ObjectSingleAction action, Player player, AbstractThingData thingData) {
         for (AbstractRunAction runAction : actions.values()) {
             String type = action.getString("type");
             if (runAction.getType().equals(type)) {
-                runAction.runAction(action, player, startLocation, check, totem);
+                runAction.runAction(action, player, thingData);
             }
         }
     }

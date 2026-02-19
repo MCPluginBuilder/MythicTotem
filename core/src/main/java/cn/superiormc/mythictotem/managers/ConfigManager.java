@@ -73,6 +73,10 @@ public class ConfigManager {
         return totems;
     }
 
+    public ObjectTotem getTotem(String id) {
+        return totems.get(id);
+    }
+
     public boolean getBoolean(String path, boolean defaultValue) {
         return config.getBoolean(path, defaultValue);
     }
@@ -107,6 +111,10 @@ public class ConfigManager {
 
     public List<String> getStringList(String path) {
         return config.getStringList(path);
+    }
+
+    public int getInt(String path, int defaultValue) {
+        return config.getInt(path, defaultValue);
     }
 
     public void plus3DTotem() {

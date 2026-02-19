@@ -5,6 +5,8 @@ import cn.superiormc.mythictotem.objects.AbstractSingleRun;
 import cn.superiormc.mythictotem.objects.ObjectAction;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
+import cn.superiormc.mythictotem.objects.singlethings.TotemActiveData;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -19,8 +21,8 @@ public class ObjectSingleAction extends AbstractSingleRun {
         this.action = action;
     }
 
-    public void doAction(Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
-        ActionManager.actionManager.doAction(this, player, startLocation, check, totem);
+    public void doAction(Player player, AbstractThingData thingData) {
+        ActionManager.actionManager.doAction(this, player, thingData);
     }
 
 

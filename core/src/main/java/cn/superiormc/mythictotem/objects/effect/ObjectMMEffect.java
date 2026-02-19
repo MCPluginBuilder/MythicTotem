@@ -1,0 +1,105 @@
+package cn.superiormc.mythictotem.objects.effect;
+
+import cn.superiormc.mythictotem.managers.ErrorManager;
+import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
+import cn.superiormc.mythictotem.utils.SchedulerUtil;
+import io.lumine.mythic.bukkit.MythicBukkit;
+import io.lumine.mythic.core.players.PlayerData;
+import io.lumine.mythic.core.skills.stats.StatModifierType;
+import io.lumine.mythic.core.skills.stats.StatRegistry;
+import io.lumine.mythic.core.skills.stats.StatSource;
+import io.lumine.mythic.core.skills.stats.StatType;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+
+import java.util.Optional;
+
+public class ObjectMMEffect extends AbstractEffect {
+
+    private final StatModifierType modifier;
+
+    private final ObjectMMEffectSource source;
+
+    private StatType statType;
+
+    public ObjectMMEffect(String id, Player player, ConfigurationSection section, BonusTotemData data) {
+        super(id, player, section, data);
+        this.player = player;
+        this.modifier = StatModifierType.get(section.getString("modifier-type", "ADD").toUpperCase());
+        this.source = new ObjectMMEffectSource(this);
+        Optional<StatType> statTypeOptional = MythicBukkit.inst().getStatManager().getStat(section.getString("stat", ""));
+        statTypeOptional.ifPresent(type -> this.statType = type);
+    }
+
+    @Override
+    public void addPlayerStat() {
+        if (statType == null || modifier == null) {
+            ErrorManager.errorManager.sendErrorMessage("§6Warning: Failed to add MythicMobs effect for player. Reason: Config Error");
+            return;
+        }
+        PlayerData profile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (profile == null) {
+            retryTimes ++;
+            if (retryTimes < 3) {
+                ErrorManager.errorManager.sendErrorMessage("§6Warning: Failed to add MythicMobs effect for player " + player.getName() + "," +
+                        " don't worry, we will retry later. Retry Times: " + retryTimes + ".");
+                SchedulerUtil.runTaskLater(this::addPlayerStat, 20L);
+            } else {
+                ErrorManager.errorManager.sendErrorMessage("§cError: Failed to add MythicMobs effect for player " + player.getName() + "," +
+                        " if this always happen, try change cache.load-mode option to JOIN in config.yml file, if it only happens sometimes, just ignore this and ask" +
+                        " this player equip the prefix again! This because effect plugin load data is slower than MythicTotem this times.");
+            }
+            return;
+        }
+        StatRegistry stats = profile.getStatRegistry();
+        if (stats == null) {
+            retryTimes ++;
+            if (retryTimes < 3) {
+                ErrorManager.errorManager.sendErrorMessage("§6Warning: Failed to add MythicMobs effect for player " + player.getName() + "," +
+                        " don't worry, we will retry later. Retry Times: " + retryTimes + ".");
+                SchedulerUtil.runTaskLater(this::addPlayerStat, 20L);
+            } else {
+                ErrorManager.errorManager.sendErrorMessage("§cError: Failed to add MythicMobs effect for player " + player.getName() + "," +
+                        " if this always happen, try change cache.load-mode option to JOIN in config.yml file, if it only happens sometimes, just ignore this and ask" +
+                        " this player equip the prefix again! This because effect plugin load data is slower than MythicTotem this times.");
+            }
+            return;
+        }
+        stats.putValue(statType, source, modifier, getDouble("value", player, data));
+    }
+
+    @Override
+    public void removePlayerStat() {
+        PlayerData profile = MythicBukkit.inst().getPlayerManager().getProfile(player);
+        if (profile != null) {
+            StatRegistry stats = profile.getStatRegistry();
+            stats.removeValue(statType, source);
+        }
+    }
+}
+
+class ObjectMMEffectSource implements StatSource {
+
+    private final ObjectMMEffect mmEffect;
+
+    public ObjectMMEffectSource(ObjectMMEffect mmEffect) {
+        this.mmEffect = mmEffect;
+    }
+
+    public ObjectMMEffect getMmEffect() {
+        return mmEffect;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ObjectMMEffectSource mmEffectSource) {
+            return mmEffectSource.mmEffect.id.equals(this.mmEffect.id);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "ObjectMMEffectSource: {id = " + mmEffect.id + "}";
+    }
+}

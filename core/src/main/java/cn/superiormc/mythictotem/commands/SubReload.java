@@ -4,6 +4,7 @@ import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.managers.ItemManager;
 import cn.superiormc.mythictotem.managers.LanguageManager;
+import cn.superiormc.mythictotem.managers.TaskManager;
 import org.bukkit.entity.Player;
 
 public class SubReload extends AbstractCommand {
@@ -17,19 +18,23 @@ public class SubReload extends AbstractCommand {
 
     @Override
     public void executeCommandInGame(String[] args, Player player) {
+        TaskManager.taskManager.cancelTask();
         MythicTotem.instance.reloadConfig();
         new ConfigManager();
         new ItemManager();
         new LanguageManager();
+        new TaskManager();
         LanguageManager.languageManager.sendStringText(player, "plugin-reloaded");
     }
 
     @Override
     public void executeCommandInConsole(String[] args) {
+        TaskManager.taskManager.cancelTask();
         MythicTotem.instance.reloadConfig();
         new ConfigManager();
         new ItemManager();
         new LanguageManager();
+        new TaskManager();
         LanguageManager.languageManager.sendStringText("plugin-reloaded");
     }
 }

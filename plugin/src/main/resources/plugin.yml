@@ -1,5 +1,5 @@
 name: MythicTotem
-version: '4.4.6'
+version: '4.5.0'
 main: cn.superiormc.mythictotem.MythicTotem
 api-version: 1.14
 folia-supported: true
@@ -35,6 +35,8 @@ softdepend:
   - MythicChanger
   - CraftEngine
   - NBTAPI
+  - AuraSkills
+  - libreforge
 commands:
   mythictotem:
     aliases:

@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects.conditions;
 
 import cn.superiormc.mythictotem.managers.ErrorManager;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public abstract class AbstractCheckCondition {
@@ -26,7 +24,7 @@ public abstract class AbstractCheckCondition {
         this.requirePlayer = b;
     }
 
-    public boolean checkCondition(ObjectSingleCondition singleCondition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public boolean checkCondition(ObjectSingleCondition singleCondition, Player player, AbstractThingData thingData) {
         if (player == null && requirePlayer) {
             return false;
         }
@@ -38,10 +36,10 @@ public abstract class AbstractCheckCondition {
                 }
             }
         }
-        return onCheckCondition(singleCondition, player, startLocation, check, totem);
+        return onCheckCondition(singleCondition, player, thingData);
     }
 
-    protected abstract boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem);
+    protected abstract boolean onCheckCondition(ObjectSingleCondition singleCondition, Player player, AbstractThingData thingData);
 
     public String getType() {
         return type;

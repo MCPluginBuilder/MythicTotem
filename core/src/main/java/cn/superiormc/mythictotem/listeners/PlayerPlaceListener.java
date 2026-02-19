@@ -1,11 +1,9 @@
 package cn.superiormc.mythictotem.listeners;
 
-import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.utils.SchedulerUtil;
 import cn.superiormc.mythictotem.utils.TextUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -37,9 +35,7 @@ public class PlayerPlaceListener implements Listener {
                     new ObjectCheck(event);
                 }
             });
-            SchedulerUtil.runTaskLater(() -> {
-                ConfigManager.configManager.getCheckingPlayer.remove(event.getPlayer());
-            }, ConfigManager.configManager.getLong("cooldown-tick", 5L));
+            SchedulerUtil.runTaskLater(() -> ConfigManager.configManager.getCheckingPlayer.remove(event.getPlayer()), ConfigManager.configManager.getLong("cooldown-tick", 5L));
         }
         if (ConfigManager.configManager.getBoolean("debug", false)) {
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §eLocation: " + event.getBlockPlaced().getLocation());

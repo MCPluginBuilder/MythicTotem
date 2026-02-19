@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects;
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
 import cn.superiormc.mythictotem.objects.conditions.ObjectSingleCondition;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.entity.Player;
@@ -41,21 +39,21 @@ public class ObjectCondition {
         }
     }
 
-    public boolean getAllBoolean(Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public boolean getAllBoolean(Player player, AbstractThingData thingData) {
         for (ObjectSingleCondition singleCondition : conditions){
-            if (!singleCondition.checkBoolean(player, startLocation, check, totem)) {
+            if (!singleCondition.checkBoolean(player, thingData)) {
                 return false;
             }
         }
         return true;
     }
 
-    public boolean getAnyBoolean(Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    public boolean getAnyBoolean(Player player, AbstractThingData thingData) {
         if (player == null) {
             return false;
         }
         for (ObjectSingleCondition singleCondition : conditions){
-            if (singleCondition.checkBoolean(player, startLocation, check, totem)) {
+            if (singleCondition.checkBoolean(player, thingData)) {
                 return true;
             }
         }

@@ -1,10 +1,7 @@
 package cn.superiormc.mythictotem.objects.actions;
 
 import cn.superiormc.mythictotem.MythicTotem;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import cn.superiormc.mythictotem.utils.CommonUtil;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.entity.Player;
 
 public class ActionPlayerCommand extends AbstractRunAction {
@@ -15,7 +12,7 @@ public class ActionPlayerCommand extends AbstractRunAction {
     }
 
     @Override
-    protected void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
-        MythicTotem.methodUtil.dispatchCommand(player, singleAction.getString("command", player, startLocation, check, totem));
+    protected void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
+        MythicTotem.methodUtil.dispatchCommand(player, singleAction.getString("command", player, thingData));
     }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 public class BlockCheckManager {
 
     public static BlockCheckManager blockCheckManager;
+
     private final Map<String, BlockChecker> checkers;
 
     public BlockCheckManager() {

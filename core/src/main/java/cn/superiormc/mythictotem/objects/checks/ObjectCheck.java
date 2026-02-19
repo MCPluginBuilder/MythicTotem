@@ -5,6 +5,7 @@ import cn.superiormc.mythictotem.api.TotemActivedEvent;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.managers.HookManager;
 import cn.superiormc.mythictotem.objects.ObjectCondition;
+import cn.superiormc.mythictotem.objects.singlethings.TotemActiveData;
 import cn.superiormc.mythictotem.utils.CommonUtil;
 import cn.superiormc.mythictotem.utils.SchedulerUtil;
 import cn.superiormc.mythictotem.utils.TextUtil;
@@ -15,7 +16,6 @@ import io.th0rgal.oraxen.mechanics.provided.gameplay.stringblock.StringBlockMech
 import net.Indyuce.mmoitems.MMOItems;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
@@ -30,10 +30,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class ObjectCheck {
 
@@ -143,7 +140,7 @@ public class ObjectCheck {
         big : for (ObjectPlaceCheck singleTotem : placedBlockCheckManagers) {
             // 条件
             ObjectCondition condition = singleTotem.getTotem().getTotemCondition();
-            if (!condition.getAllBoolean(player, block.getLocation(), this, singleTotem)) {
+            if (!condition.getAllBoolean(player, new TotemActiveData(block.getLocation(), this, singleTotem))) {
                 if (ConfigManager.configManager.getBoolean("debug", false)) {
                     TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §eSkipped " + singleTotem.getTotem().getTotemID() +
                             " because conditions not meet!");
@@ -634,10 +631,26 @@ public class ObjectCheck {
             }
         }
         SchedulerUtil.runSync(() -> {
-            if (singleTotem.getTotem().getTotemDisappear()) {
-                for (Location loc : validTotemBlockLocation) {
-                    CommonUtil.removeBlock(loc.getBlock());
+            if (singleTotem.getTotem().checkAllBlocksAfterActive()) {
+
+                int size = validTotemBlockLocation.size();
+                int middleIndex = size / 2;
+
+                UUID uuid = UUID.randomUUID();
+                for (int i = 0; i < size; i++) {
+                    Location loc = validTotemBlockLocation.get(i);
+                    Block blockAtLoc = loc.getBlock();
+
+                    if (singleTotem.getTotem().getTotemDisappear()) {
+                        CommonUtil.removeBlock(blockAtLoc);
+                    }
+
+                    if (singleTotem.getTotem().isBonusEffectsEnabled()) {
+                        boolean isCore = (i == middleIndex);
+                        singleTotem.getTotem().addBonusEffects(blockAtLoc, isCore, uuid);
+                    }
                 }
+
             }
             if (event instanceof EntityPlaceEvent) {
                 ((EntityPlaceEvent) event).getEntity().remove();
@@ -645,7 +658,7 @@ public class ObjectCheck {
             for (Entity singleEntity : needRemoveEntities) {
                 singleEntity.remove();
             }
-            singleTotem.getTotem().getTotemAction().runAllActions(player, startLocation, this, singleTotem);
+            singleTotem.getTotem().getTotemAction().runAllActions(player, new TotemActiveData(startLocation, this, singleTotem));
             TotemActivedEvent totemActivedEvent = new TotemActivedEvent(
                     singleTotem.getTotem().getTotemID(),
                     this.player,

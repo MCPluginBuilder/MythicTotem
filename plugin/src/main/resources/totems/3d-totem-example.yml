@@ -20,4 +20,28 @@ actions:
     type: mythicmobs_spawn
     entity: 'SkeletalKnight'
 conditions: []
-disappear: true
+disappear: false
+bonus-effects:
+  enabled: true
+  range: 16
+  period-ticks: 60
+  effects:
+    enabled: true
+    1:
+      type: MythicMobs
+      modifier-type: SET # ADD, SET, MULTIPLY, COMPOUND
+      stat: HEALTH
+      value: 100
+  apply-actions:
+    1:
+      type: message
+      message: 'Totem active now!'
+  remove-actions:
+    1:
+      type: message
+      message: 'Totem inactive now!'
+  circle-actions:
+    1:
+      type: give_item
+      item:
+        material: apple

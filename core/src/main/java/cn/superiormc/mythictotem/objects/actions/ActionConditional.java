@@ -3,9 +3,7 @@ package cn.superiormc.mythictotem.objects.actions;
 import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.objects.ObjectAction;
 import cn.superiormc.mythictotem.objects.ObjectCondition;
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
-import org.bukkit.Location;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -17,7 +15,7 @@ public class ActionConditional extends AbstractRunAction {
     }
 
     @Override
-    protected void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
         if (MythicTotem.freeVersion) {
             return;
         }
@@ -26,7 +24,7 @@ public class ActionConditional extends AbstractRunAction {
             return;
         }
         ObjectCondition condition = new ObjectCondition(conditionSection);
-        if (!condition.getAllBoolean(player, startLocation, check, totem)) {
+        if (!condition.getAllBoolean(player, thingData)) {
             return;
         }
         ConfigurationSection actionSection = singleAction.getSection().getConfigurationSection("actions");
@@ -34,6 +32,6 @@ public class ActionConditional extends AbstractRunAction {
             return;
         }
         ObjectAction action = new ObjectAction(actionSection);
-        action.runAllActions(player, startLocation, check, totem);
+        action.runAllActions(player, thingData);
     }
 }

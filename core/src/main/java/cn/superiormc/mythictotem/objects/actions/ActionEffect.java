@@ -1,9 +1,7 @@
 package cn.superiormc.mythictotem.objects.actions;
 
-import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
-import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import cn.superiormc.mythictotem.utils.CommonUtil;
-import org.bukkit.Location;
 import org.bukkit.Registry;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
@@ -17,7 +15,7 @@ public class ActionEffect extends AbstractRunAction {
     }
 
     @Override
-    protected void onDoAction(ObjectSingleAction singleAction, Player player, Location startLocation, ObjectCheck check, ObjectPlaceCheck totem) {
+    protected void onDoAction(ObjectSingleAction singleAction, Player player, AbstractThingData thingData) {
         PotionEffectType potionEffectType;
         if (CommonUtil.getMajorVersion(20)) {
             potionEffectType = Registry.POTION_EFFECT_TYPE.get(CommonUtil.parseNamespacedKey(singleAction.getString("potion")));
