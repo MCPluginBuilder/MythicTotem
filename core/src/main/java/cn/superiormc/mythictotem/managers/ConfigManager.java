@@ -4,6 +4,7 @@ import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.objects.ObjectTotem;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Item;
@@ -109,8 +110,27 @@ public class ConfigManager {
         return config.getString(originalPath, config.getString(newPath, defaultValue));
     }
 
+    public String getString(Player player, String path, String... args) {
+        String tempVal1 = getString(path, args);
+        if (tempVal1.equalsIgnoreCase("{lang}")) {
+            String tempVal2 = LanguageManager.languageManager.getStringText(player, "override-lang." + path, args);
+            if (tempVal2 != null) {
+                return tempVal2;
+            }
+        }
+        return tempVal1;
+    }
+
+
     public List<String> getStringList(String path) {
         return config.getStringList(path);
+    }
+
+    public ConfigurationSection getConfigurationSection(String path) {
+        if (!config.contains(path)) {
+            return null;
+        }
+        return config.getConfigurationSection(path);
     }
 
     public int getInt(String path, int defaultValue) {

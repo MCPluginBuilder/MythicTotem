@@ -35,12 +35,6 @@ public class ObjectTotem {
 
     private final ObjectCondition totemCondition;
 
-    private ObjectAction bonusEffectApplyActions;
-
-    private ObjectAction bonusEffectRemoveActions;
-
-    private ObjectAction bonusEffectCircleActions;
-
     private final List<String> totemCoreBlocks;
 
     private final boolean totemDisappear;
@@ -53,8 +47,6 @@ public class ObjectTotem {
     
     private final String totemID;
 
-    private final Map<UUID, EffectStatus> mmoEffects = new HashMap<>();
-
     public ObjectTotem(String id, YamlConfiguration section) {
         this.totemID = id;
         this.totemDisappear = section.getBoolean("disappear", true);
@@ -62,12 +54,7 @@ public class ObjectTotem {
         this.totemCondition = new ObjectCondition(section.getConfigurationSection("conditions"));
         this.totemCheckMode = section.getString("mode", "VERTICAL").toUpperCase();
         this.totemCoreBlocks = section.getStringList("core-blocks");
-        this.totemBonusEffects = section.getBoolean("bonus-effects.enabled");
-        if (totemBonusEffects) {
-            this.bonusEffectApplyActions = new ObjectAction(section.getConfigurationSection("bonus-effects.apply-actions"));
-            this.bonusEffectRemoveActions = new ObjectAction(section.getConfigurationSection("bonus-effects.remove-actions"));
-            this.bonusEffectCircleActions = new ObjectAction(section.getConfigurationSection("bonus-effects.circle-actions"));
-        }
+        this.totemBonusEffects = ConfigManager.configManager.getBoolean("bonus-effects.enabled", false) && section.getBoolean("bonus-effects.enabled");
         this.totemSection = section;
         ConfigurationSection totemLayoutsExplainConfig = section.getConfigurationSection("explains");
         if (totemLayoutsExplainConfig == null) {
@@ -222,7 +209,7 @@ public class ObjectTotem {
     }
 
     public void addBonusEffects(Block block, boolean isCore, UUID uuid) {
-        if (!totemSection.getBoolean("bonus-effects.enabled", false)) {
+        if (!totemBonusEffects) {
             return;
         }
         if (this.totemDisappear) {
@@ -233,48 +220,11 @@ public class ObjectTotem {
         BonusEffectsManager.manager.addBonusEffectBlock(block, totemSection.getInt("bonus-effects.default-level", 1), totemID, isCore, uuid);
     }
 
-    public double getBonusEffectsRange(BonusTotemData data) {
-        double levelRange = totemSection.getDouble("bonus-effects.range." + data.level, -1.0);
-        if (levelRange < 0) {
-            double maxRange = totemSection.getDouble("bonus-effects.range.max", -1.0);
-            if (maxRange < 0) {
-                return totemSection.getDouble("bonus-effects.range", 10.0);
-            }
-            return maxRange;
-        }
-        return levelRange;
-    }
-
     public boolean isBonusEffectsEnabled() {
         return totemBonusEffects;
     }
 
     public boolean checkAllBlocksAfterActive() {
         return totemDisappear || totemBonusEffects;
-    }
-
-    public void runBonusEffectsApplyActions(Player player, BonusTotemData data) {
-        if (totemSection.getBoolean("bonus-effects.effects.enabled", false)) {
-            TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §fStarted effect for player " + player.getName());
-            mmoEffects.put(player.getUniqueId(), EffectUtil.startEffect(this, player, data));
-        }
-        bonusEffectApplyActions.runAllActions(player, data);
-    }
-
-    public void runBonusEffectsCircleActions(Player player, BonusTotemData data) {
-        if (mmoEffects.get(player.getUniqueId()) != null) {
-            mmoEffects.get(player.getUniqueId()).retryActiveEffects(data);
-        }
-        bonusEffectCircleActions.runAllActions(player, data);
-    }
-
-    public void runBonusEffectsRemoveActions(Player player, BonusTotemData data) {
-        if (mmoEffects.get(player.getUniqueId()) != null) {
-            for (AbstractEffect tempVal1 : mmoEffects.get(player.getUniqueId()).getActivedEffects()) {
-                tempVal1.removePlayerStat();
-            }
-            mmoEffects.remove(player.getUniqueId());
-        }
-        bonusEffectRemoveActions.runAllActions(player, data);
     }
 }

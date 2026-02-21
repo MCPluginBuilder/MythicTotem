@@ -2,6 +2,7 @@ package cn.superiormc.mythictotem.managers;
 
 import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.objects.ObjectTotem;
+import cn.superiormc.mythictotem.objects.checks.ObjectPriceCheck;
 import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -17,7 +18,7 @@ public class BonusEffectsManager {
 
     public static final NamespacedKey KEY_CHUNK_TOTEMS = new NamespacedKey(MythicTotem.instance, "bonus_totems");
 
-    private final Map<Chunk, List<BonusTotemData>> totemMap = new ConcurrentHashMap<>();
+    private final Map<Chunk, Collection<BonusTotemData>> totemMap = new ConcurrentHashMap<>();
 
     private final Map<UUID, Map<Location, BonusTotemData>> playerActive = new ConcurrentHashMap<>();
 
@@ -86,7 +87,7 @@ public class BonusEffectsManager {
                         center.getZ() + dz
                 );
 
-                List<BonusTotemData> list = totemMap.get(chunk);
+                Collection<BonusTotemData> list = totemMap.get(chunk);
                 if (list == null) {
                     continue;
                 }
@@ -104,7 +105,7 @@ public class BonusEffectsManager {
 
                     double distSq = totemData.location.distance(loc);
 
-                    if (distSq <= totem.getBonusEffectsRange(totemData)) {
+                    if (distSq <= totemData.getRange()) {
                         nowInRange.add(totemData.location);
                         if (ConfigManager.configManager.getBoolean("bonus-effects.range-display.enabled", true)) {
                             showTotemRange(player, totemData);
@@ -174,7 +175,7 @@ public class BonusEffectsManager {
     }
 
     private void saveToChunkPDC(Chunk chunk) {
-        List<BonusTotemData> list = totemMap.get(chunk);
+        Collection<BonusTotemData> list = totemMap.get(chunk);
 
         if (list == null || list.isEmpty()) {
             chunk.getPersistentDataContainer().remove(KEY_CHUNK_TOTEMS);
@@ -185,7 +186,7 @@ public class BonusEffectsManager {
 
         for (BonusTotemData data : list) {
             sb.append(locToString(data.location)).append(";;")
-                    .append(data.level).append(";;")
+                    .append(data.getLevel()).append(";;")
                     .append(data.placeTime).append(";;")
                     .append(data.totemId).append(";;")
                     .append(data.isCore).append(";;")
@@ -203,9 +204,11 @@ public class BonusEffectsManager {
     public void destroyTotem(Location brokenLocation) {
 
         Chunk chunk = brokenLocation.getChunk();
-        List<BonusTotemData> list = totemMap.get(chunk);
+        Collection<BonusTotemData> list = totemMap.get(chunk);
 
-        if (list == null) return;
+        if (list == null) {
+            return;
+        }
 
         BonusTotemData target = null;
 
@@ -216,12 +219,18 @@ public class BonusEffectsManager {
             }
         }
 
-        if (target == null) return;
+        if (target == null) {
+            return;
+        }
 
+        destroyTotem(target);
+    }
+
+    public void destroyTotem(BonusTotemData target) {
         UUID uuid = target.totemUUID;
 
-        for (Map.Entry<Chunk, List<BonusTotemData>> entry : totemMap.entrySet()) {
-            List<BonusTotemData> chunkList = entry.getValue();
+        for (Map.Entry<Chunk, Collection<BonusTotemData>> entry : totemMap.entrySet()) {
+            Collection<BonusTotemData> chunkList = entry.getValue();
 
             boolean changed = chunkList.removeIf(data -> data.totemUUID.equals(uuid));
 
@@ -252,21 +261,17 @@ public class BonusEffectsManager {
 
 
     private void applyBonus(Player player, BonusTotemData data) {
-        if (data.totem != null) {
-            data.totem.runBonusEffectsApplyActions(player, data);
-        }
+        data.runBonusEffectsApplyActions(player);
     }
 
     private void removeBonus(Player player, BonusTotemData data) {
-        if (data.totem != null) {
-            data.totem.runBonusEffectsRemoveActions(player, data);
-        }
+        data.runBonusEffectsRemoveActions(player);
     }
 
     private void circleBonus(Player player, BonusTotemData data) {
-        if (data.totem != null && data.canExecuteCircleActionAgain()) {
+        if (data.canExecuteCircleActionAgain()) {
             data.setNewLastCircleTime();
-            data.totem.runBonusEffectsCircleActions(player, data);
+            data.runBonusEffectsCircleActions(player);
         }
     }
 
@@ -322,7 +327,7 @@ public class BonusEffectsManager {
             return;
         }
 
-        double radius = totem.getBonusEffectsRange(data);
+        double radius = data.getRange();
         Location center = data.location.clone().add(0.5, 0.1, 0.5);
         World world = center.getWorld();
         if (world == null) {
@@ -344,6 +349,57 @@ public class BonusEffectsManager {
                     0
             );
         }
+    }
+
+    public BonusTotemData getBonusTotemAt(Location location) {
+        Collection<BonusTotemData> list = totemMap.get(location.getChunk());
+        if (list == null) {
+            return null;
+        }
+        for (BonusTotemData data : list) {
+            if (data.location.equals(location)) {
+                return data;
+            }
+        }
+        return null;
+    }
+
+    public boolean upgradeBonusTotem(Player player, BonusTotemData data) {
+        if (data.totem == null) {
+            return false;
+        }
+
+        int maxLevel = data.getMaxLevel();
+        if (data.getLevel() >= maxLevel) {
+            LanguageManager.languageManager.sendStringText(player, "bonus-gui-max-level");
+            return false;
+        }
+
+        ObjectPriceCheck priceCheck = data.getUpgradePrice(player);
+
+        if (!priceCheck.CheckPrice(false, null)) {
+            LanguageManager.languageManager.sendStringText(player, "bonus-gui-upgrade-failed");
+            return false;
+        }
+        priceCheck.CheckPrice(true, null);
+        Collection<Chunk> chunks = new ArrayList<>();
+        for (Collection<BonusTotemData> tempVal1 : totemMap.values()) {
+            for (BonusTotemData tempVal2 : tempVal1) {
+                if (tempVal2.totemUUID.equals(data.totemUUID)) {
+                    removeBonus(player, tempVal2);
+                    tempVal2.levelUp();
+                    applyBonus(player, tempVal2);
+                    chunks.add(tempVal2.location.getChunk());
+                }
+            }
+        }
+
+        for (Chunk tempVal3 : chunks) {
+            saveToChunkPDC(tempVal3);
+        }
+
+        LanguageManager.languageManager.sendStringText(player, "bonus-gui-upgrade-success", "level", String.valueOf(data.getLevel()));
+        return true;
     }
 
 }

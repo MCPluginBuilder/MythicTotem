@@ -23,25 +23,112 @@ conditions: []
 disappear: false
 bonus-effects:
   enabled: true
-  range: 16
-  period-ticks: 60
-  effects:
-    enabled: true
-    1:
-      type: MythicMobs
-      modifier-type: SET # ADD, SET, MULTIPLY, COMPOUND
-      stat: HEALTH
-      value: 100
-  apply-actions:
-    1:
-      type: message
-      message: 'Totem active now!'
-  remove-actions:
-    1:
-      type: message
-      message: 'Totem inactive now!'
-  circle-actions:
-    1:
-      type: give_item
-      item:
-        material: apple
+  max-level: 5
+
+  1:
+    range: 16
+    period-ticks: 60
+
+    price:
+      material: diamond
+      amount: 64
+      placeholder: '钻石 x{amount}'
+
+    description: '10 血 + 每秒给一个苹果'
+
+    effects:
+      enabled: true
+      1:
+        type: MythicMobs
+        modifier-type: ADD
+        stat: HEALTH
+        value: 10
+
+    apply-actions:
+      1:
+        type: message
+        message: "§aLv1 图腾激活！"
+
+    remove-actions:
+      1:
+        type: message
+        message: "§cLv1 图腾失效！"
+
+    circle-actions:
+      1:
+        type: give_item
+        item:
+          material: apple
+
+
+  2:
+    range: 20
+    period-ticks: 40
+
+    price:
+      material: diamond
+      amount: 128
+      placeholder: '钻石 x{amount}'
+
+    description: '15 血 + 每2秒给一个金苹果'
+
+    effects:
+      enabled: true
+
+      1:
+        type: MythicMobs
+        modifier-type: ADD
+        stat: HEALTH
+        value: 15
+
+    apply-actions:
+      1:
+        type: message
+        message: "§bLv2 图腾增强！"
+
+    remove-actions:
+      1:
+        type: message
+        message: "§7Lv2 效果结束！"
+
+    circle-actions:
+      1:
+        type: give_item
+        item:
+          material: golden_apple
+
+
+  3:
+    range: 30
+    period-ticks: 20
+
+    price:
+      material: diamond
+      amount: 256
+      placeholder: '钻石 x{amount}'
+
+    description: '20 血 + 每秒给一个附魔金苹果'
+
+    effects:
+      enabled: true
+      1:
+        type: MythicMobs
+        modifier-type: ADD
+        stat: HEALTH
+        value: 20
+
+    apply-actions:
+      1:
+        type: message
+        message: "§6Lv3 终极图腾启动！"
+
+    remove-actions:
+      1:
+        type: message
+        message: "§8终极效果消失！"
+
+    circle-actions:
+      1:
+        type: give_item
+        item:
+          material: enchanted_golden_apple

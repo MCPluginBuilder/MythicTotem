@@ -4,6 +4,7 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -63,4 +64,6 @@ public interface SpecialMethodUtil {
                             String... args);
 
     ConfigurationSection serializeItemStack(ItemStack item);
+
+    Inventory createNewInv(Player player, int size, String text);
 }

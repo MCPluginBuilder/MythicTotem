@@ -6,9 +6,9 @@ import cn.superiormc.mythictotem.managers.ErrorManager;
 import cn.superiormc.mythictotem.managers.HookManager;
 import cn.superiormc.mythictotem.methods.BuildItem;
 import cn.superiormc.mythictotem.utils.CommonUtil;
+import cn.superiormc.mythictotem.utils.MathUtil;
 import cn.superiormc.mythictotem.utils.SchedulerUtil;
 import cn.superiormc.mythictotem.utils.TextUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -24,12 +24,16 @@ public class ObjectPriceCheck {
 
     private final String type;
 
+    private final double cost;
+
     public ObjectPriceCheck(ConfigurationSection section, Player player, Block block) {
         this.section = section;
         this.player = player;
         this.block = block;
         if (section == null) {
             type = "unknown";
+            this.cost = 0;
+            return;
         } else if (section.contains("hook-plugin") && section.contains("hook-item")) {
             type = "hook";
         } else if (section.contains("match-item") && CommonUtil.checkPluginLoad("MythicChanger")) {
@@ -45,6 +49,7 @@ public class ObjectPriceCheck {
         } else {
             type = "free";
         }
+        this.cost = MathUtil.doCalculate(section.getString("amount", "1"));
         if (ConfigManager.configManager.getBoolean("debug", false)) {
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §aPrice Type: " + type + "!");
         }
@@ -68,30 +73,38 @@ public class ObjectPriceCheck {
                 priceBoolean = ItemPriceUtil.getPrice(section.getString("hook-plugin"),
                         section.getString("hook-item"),
                         player,
-                        section.getInt("amount", 1), take, keyItems);
+                        (int) cost, take, keyItems);
                 break;
             case "match":
-                priceBoolean = ItemPriceUtil.getPrice(player, section, section.getInt("amount", 1), take);
+                priceBoolean = ItemPriceUtil.getPrice(player, section, (int) cost, take);
                 break;
             case "vanilla":
                 priceBoolean = ItemPriceUtil.getPrice(player,
                         BuildItem.buildItemStack(player, section, 1),
-                        section.getInt("amount", 1),
+                        (int) cost,
                         take, keyItems);
                 break;
             case "economy":
                 priceBoolean = HookManager.hookManager.getPrice(player, section.getString("economy-plugin"),
                         section.getString("economy-type", "default"),
-                        section.getDouble("amount", 0), take);
+                        cost, take);
                 break;
             case "exp":
                 priceBoolean = HookManager.hookManager.getPrice(player, section.getString("economy-type"),
-                        section.getInt("amount", 0), take);
+                        (int) cost, take);
                 break;
             case "unknwon":
                 ErrorManager.errorManager.sendErrorMessage("§cError: There is something wrong in your totem configs!");
                 break;
         }
         return priceBoolean;
+    }
+
+    public ConfigurationSection getSection() {
+        return section;
+    }
+
+    public double getCost() {
+        return cost;
     }
 }

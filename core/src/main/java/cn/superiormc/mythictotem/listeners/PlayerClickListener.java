@@ -1,11 +1,9 @@
 package cn.superiormc.mythictotem.listeners;
 
-import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.utils.SchedulerUtil;
 import cn.superiormc.mythictotem.utils.TextUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -30,6 +28,7 @@ public class PlayerClickListener implements Listener {
         if (!EquipmentSlot.HAND.equals(event.getHand())) {
             return;
         }
+
         ConfigManager.configManager.getCheckingPlayer.add(event.getPlayer());
         SchedulerUtil.runTaskAsynchronously(() -> {
             synchronized(event) {

@@ -24,3 +24,6 @@ error-save-item-not-found: "&#98FB98[MythicTotem] &c找不到名称为 {item} �
 in-game: "&#98FB98[MythicTotem] &c你必须在游戏中使用这个指令!"
 give-save-item: "&#98FB98[MythicTotem] &f给予玩家 {player} 保存物品 {item} x{amount}!"
 generated: "&#98FB98[MythicTotem] &f已在插件根目录下生成手持物品的物品格式文件!"
+bonus-gui-upgrade-success: "&#98FB98[MythicTotem] &f增益图腾已升级到 &a{level} &f级！"
+bonus-gui-upgrade-failed: "&#98FB98[MythicTotem] &c升级该图腾所需资源不足。"
+bonus-gui-max-level: "&#98FB98[MythicTotem] &e该增益图腾已达到最高等级。"

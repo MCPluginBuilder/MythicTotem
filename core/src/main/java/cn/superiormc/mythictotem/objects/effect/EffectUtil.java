@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 public class EffectUtil {
 
-    public static EffectStatus startEffect(ObjectTotem totem, Player player, BonusTotemData data) {
+    public static EffectStatus startEffect(Player player, BonusTotemData data) {
         EffectStatus effectStatus = new EffectStatus();
-        ConfigurationSection section = totem.getSection().getConfigurationSection("bonus-effects.effects");
+        ConfigurationSection section = data.getSection().getConfigurationSection("effects");
         if (section != null) {
             for (String tempVal1 : section.getKeys(false)) {
                 if (tempVal1.equals("enabled")) {
@@ -24,21 +24,21 @@ public class EffectUtil {
                 switch (tempVal3.getString("type", "MythicLib")) {
                     case "MythicLib":
                         if (CommonUtil.checkPluginLoad("MythicLib")) {
-                            tempVal2 = new ObjectMMOEffect(totem.getTotemID() + tempVal1,
+                            tempVal2 = new ObjectMMOEffect(data.totemUUID + tempVal1,
                                     player,
                                     tempVal3, data);
                         }
                         break;
                     case "MythicMobs":
                         if (CommonUtil.checkPluginLoad("MythicMobs")) {
-                            tempVal2 = new ObjectMMEffect(totem.getTotemID() + tempVal1,
+                            tempVal2 = new ObjectMMEffect(data.totemUUID + tempVal1,
                                     player,
                                     tempVal3, data);
                         }
                         break;
                     case "AuraSkills":
                         if (CommonUtil.checkPluginLoad("AuraSkills")) {
-                            tempVal2 = new ObjectAuraSkillsEffect(totem.getTotemID() + tempVal1,
+                            tempVal2 = new ObjectAuraSkillsEffect(data.totemUUID + tempVal1,
                                     player,
                                     tempVal3, data);
                         }

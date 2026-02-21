@@ -1,0 +1,43 @@
+package cn.superiormc.mythictotem.gui;
+
+import cn.superiormc.mythictotem.MythicTotem;
+import cn.superiormc.mythictotem.listeners.GUIListener;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.Inventory;
+
+public abstract class InvGUI extends AbstractGUI {
+
+    protected Inventory inv;
+
+    public Listener guiListener;
+
+    public String title;
+
+    public InvGUI(Player player) {
+        super(player);
+    }
+
+    public abstract boolean clickEventHandle(Inventory inventory, ClickType type, int slot);
+
+    @Override
+    public void openGUI() {
+        constructGUI();
+        if (inv != null) {
+            player.openInventory(inv);
+        }
+        this.guiListener = new GUIListener(this);
+        Bukkit.getPluginManager().registerEvents(guiListener, MythicTotem.instance);
+    }
+
+    public Inventory getInv() {
+        return inv;
+    }
+
+    public ConfigurationSection getSection() {
+        return null;
+    }
+}

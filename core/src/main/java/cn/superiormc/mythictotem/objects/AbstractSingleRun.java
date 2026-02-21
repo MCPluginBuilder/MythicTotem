@@ -70,7 +70,13 @@ public abstract class AbstractSingleRun {
                     "block_z", String.valueOf(bonusTotemData.location.getZ()),
                     "totem_id", bonusTotemData.totemId,
                     "bonus_uuid", bonusTotemData.totemUUID.toString(),
-                    "bonus_level", String.valueOf(bonusTotemData.level));
+                    "bonus_level", String.valueOf(bonusTotemData.getLevel()),
+                    "bonus_range", String.format("%.1f", bonusTotemData.getRange()),
+                    "bonus_description", bonusTotemData.getDescription(),
+                    "next_level", String.valueOf(bonusTotemData.getLevel() + 1),
+                    "next_price", bonusTotemData.getUpgradePriceName(player),
+                    "next_description", bonusTotemData.getDescription(bonusTotemData.getLevel() + 1),
+                    "next_price_amount", String.valueOf(bonusTotemData.getUpgradePrice(player).getCost()));
         }
         if (player != null) {
             content = TextUtil.withPAPI(content, player);

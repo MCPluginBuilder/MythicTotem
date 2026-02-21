@@ -127,19 +127,21 @@ public class PaperMethodUtil implements SpecialMethodUtil {
 
     @Override
     public void setItemName(ItemMeta meta, String name, Player player) {
+        name = TextUtil.withPAPI(name, player);
         if (PaperTextUtil.containsLegacyCodes(name)) {
             name = "<!i>" + name;
         }
-        meta.displayName(PaperTextUtil.modernParse(name, player));
+        meta.displayName(PaperTextUtil.modernParse(name));
     }
 
     @Override
     public void setItemItemName(ItemMeta meta, String itemName, Player player) {
+        itemName = TextUtil.withPAPI(itemName, player);
         if (!itemName.isEmpty()) {
             if (PaperTextUtil.containsLegacyCodes(itemName)) {
                 itemName = "<!i>" + itemName;
             }
-            meta.itemName(PaperTextUtil.modernParse(itemName, player));
+            meta.itemName(PaperTextUtil.modernParse(itemName));
         } else {
             meta.itemName();
         }
@@ -150,10 +152,11 @@ public class PaperMethodUtil implements SpecialMethodUtil {
         List<Component> veryNewLore = new ArrayList<>();
         for (String lore : lores) {
             for (String singleLore : lore.split("\\\\n")) {
+                singleLore = TextUtil.withPAPI(singleLore, player);
                 if (PaperTextUtil.containsLegacyCodes(singleLore)) {
                     singleLore = "<!i>" + singleLore;
                 }
-                veryNewLore.add(PaperTextUtil.modernParse(singleLore, player));
+                veryNewLore.add(PaperTextUtil.modernParse(singleLore));
             }
         }
         if (!veryNewLore.isEmpty()) {
@@ -256,5 +259,10 @@ public class PaperMethodUtil implements SpecialMethodUtil {
             return null;
         }
         return DebuildItemPaper.serializeItemStack(item);
+    }
+
+    @Override
+    public Inventory createNewInv(Player player, int size, String text) {
+        return Bukkit.createInventory(player, size, PaperTextUtil.modernParse(text, player));
     }
 }
