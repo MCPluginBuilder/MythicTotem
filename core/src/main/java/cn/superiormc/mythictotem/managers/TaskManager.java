@@ -1,5 +1,6 @@
 package cn.superiormc.mythictotem.managers;
 
+import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.utils.SchedulerUtil;
 
 public class TaskManager {
@@ -10,7 +11,7 @@ public class TaskManager {
 
     public TaskManager() {
         taskManager = this;
-        if (ConfigManager.configManager.getBoolean("bonus-effects.enabled", false)) {
+        if (!MythicTotem.isFolia && ConfigManager.configManager.getBoolean("bonus-effects.enabled", false)) {
             initBonusEffectsTasks();
         }
     }

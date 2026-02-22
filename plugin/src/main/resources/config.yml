@@ -66,6 +66,22 @@ bonus-effects:
   range-display:
     enabled: true
     particle: END_ROD
+  limit:
+    enabled: true
+    value:
+      default:
+        default: 1
+        vip: 2
+      # Group ID
+      # advanced:
+      #   default: 1
+      #   vip: 1
+    conditions:
+      vip:
+        1:
+          type: permission
+          permission: 'group.vip'
+    same-totem-only-active-once: true
   gui:
     enabled: true
     title: 'Totem Info'
@@ -81,6 +97,9 @@ bonus-effects:
         - '&7Totem Level: {bonus_level}'
         - '&7Totem Bonus:'
         - '&7{bonus_description}'
+        - '&bYou'
+        - '&7Totem Limit: {bonus_limit}'
+        - '&7Active Bonus Amount: {bonus_amount}'
     totem-upgrade-item:
       slot: 15
       material: EMERALD_BLOCK

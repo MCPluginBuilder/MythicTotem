@@ -38,7 +38,7 @@ public class ListenerManager {
             Bukkit.getPluginManager().registerEvents(new EntityPlaceListener(), MythicTotem.instance);
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §fEnabled EntityPlaceEvent trigger.");
         }
-        if (ConfigManager.configManager.getBoolean("bonus-effects.enabled", false)) {
+        if (!MythicTotem.isFolia && ConfigManager.configManager.getBoolean("bonus-effects.enabled", false)) {
             Bukkit.getPluginManager().registerEvents(new BonusEffectsListener(), MythicTotem.instance);
         }
     }

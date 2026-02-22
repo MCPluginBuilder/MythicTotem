@@ -5,6 +5,7 @@ import cn.superiormc.mythictotem.gui.InvGUI;
 import cn.superiormc.mythictotem.managers.BonusEffectsManager;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.methods.BuildItem;
+import cn.superiormc.mythictotem.objects.effect.EffectUtil;
 import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import cn.superiormc.mythictotem.utils.TextUtil;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,6 +53,8 @@ public class TotemInfoGUI extends InvGUI {
                 "bonus_level", String.valueOf(data.getLevel()),
                 "bonus_range", String.format("%.1f", data.getRange()),
                 "bonus_description", data.getDescription(),
+                "bonus_limit", String.valueOf(EffectUtil.getMaxEffectsAmount(player, data)),
+                "bonus_amount", String.valueOf(BonusEffectsManager.manager.getPlayerActivedBonus(player).size()),
                 "next_level", String.valueOf(data.getLevel() + 1),
                 "next_price", data.getUpgradePriceName(player),
                 "next_price_amount", String.valueOf(data.getUpgradePrice(player).getCost()),

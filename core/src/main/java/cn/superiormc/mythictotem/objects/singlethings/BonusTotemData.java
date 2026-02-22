@@ -12,10 +12,11 @@ import cn.superiormc.mythictotem.utils.TextUtil;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.NonNull;
 
 import java.util.*;
 
-public class BonusTotemData extends AbstractThingData {
+public class BonusTotemData extends AbstractThingData implements Comparable<BonusTotemData> {
 
     public final Location location;
 
@@ -225,8 +226,20 @@ public class BonusTotemData extends AbstractThingData {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof BonusTotemData data) {
-            return location.equals(data.location) && totemUUID.equals(data.totemUUID);
+            if (data.isCore) {
+                return this.isCore && this.totemUUID.equals(data.totemUUID);
+            }
+            if (this.isCore) {
+                return false;
+            }
+            return this.location.equals(data.location) && this.totemUUID.equals(data.totemUUID);
         }
         return false;
+    }
+
+
+    @Override
+    public int compareTo(@NonNull BonusTotemData data) {
+        return (int) (data.placeTime - this.placeTime);
     }
 }

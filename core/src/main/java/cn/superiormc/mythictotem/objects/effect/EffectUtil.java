@@ -1,10 +1,17 @@
 package cn.superiormc.mythictotem.objects.effect;
 
+import cn.superiormc.mythictotem.managers.ConfigManager;
+import cn.superiormc.mythictotem.objects.ObjectCondition;
 import cn.superiormc.mythictotem.objects.ObjectTotem;
 import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import cn.superiormc.mythictotem.utils.CommonUtil;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 public class EffectUtil {
 
@@ -55,6 +62,49 @@ public class EffectUtil {
             }
         }
         return effectStatus;
+    }
+
+    public static int getMaxEffectsAmount(Player player, BonusTotemData data) {
+        if (!ConfigManager.configManager.getBoolean("bonus-effects.limit.enabled", true) || data.totem == null) {
+            return Integer.MAX_VALUE;
+        }
+        String groupID = data.totem.getSection().getString("bonus-effects.group", null);
+        ConfigurationSection section;
+        if (groupID == null) {
+            section = ConfigManager.configManager.getConfigurationSection("bonus-effects.limit.value.default");
+            if (section == null) {
+                section = ConfigManager.configManager.getConfigurationSection("bonus-effects.limit.value");
+                if (section == null) {
+                    return Integer.MAX_VALUE;
+                }
+            }
+        } else {
+            section = ConfigManager.configManager.getConfigurationSection("bonus-effects.limit.value" + groupID);
+            if (section == null) {
+                return Integer.MAX_VALUE;
+            }
+        }
+        ConfigurationSection conditionSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.limit.conditions");
+        if (conditionSection == null) {
+            return section.getInt("default", Integer.MAX_VALUE);
+        }
+        Set<String> groupNameSet = conditionSection.getKeys(false);
+        List<Integer> result = new ArrayList<>();
+        for (String groupName : groupNameSet) {
+            ObjectCondition condition = new ObjectCondition(conditionSection.getConfigurationSection(groupName));
+            if (section.getInt(groupName, 0) > 0 && condition.getAllBoolean(player, data)) {
+                result.add(section.getInt(groupName));
+            }
+            else {
+                if (section.getInt("default") > 0) {
+                    result.add(section.getInt("default", 1));
+                }
+            }
+        }
+        if (result.isEmpty()) {
+            result.add(1);
+        }
+        return Collections.max(result);
     }
 
 }

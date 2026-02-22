@@ -1,13 +1,16 @@
 package cn.superiormc.mythictotem.objects;
 
+import cn.superiormc.mythictotem.managers.BonusEffectsManager;
 import cn.superiormc.mythictotem.objects.checks.ObjectCheck;
 import cn.superiormc.mythictotem.objects.checks.ObjectPlaceCheck;
+import cn.superiormc.mythictotem.objects.effect.EffectUtil;
 import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
 import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import cn.superiormc.mythictotem.objects.singlethings.TotemActiveData;
 import cn.superiormc.mythictotem.utils.CommonUtil;
 import cn.superiormc.mythictotem.utils.MathUtil;
 import cn.superiormc.mythictotem.utils.TextUtil;
+import org.bukkit.Effect;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -73,6 +76,8 @@ public abstract class AbstractSingleRun {
                     "bonus_level", String.valueOf(bonusTotemData.getLevel()),
                     "bonus_range", String.format("%.1f", bonusTotemData.getRange()),
                     "bonus_description", bonusTotemData.getDescription(),
+                    "bonus_limit", String.valueOf(EffectUtil.getMaxEffectsAmount(player, bonusTotemData)),
+                    "bonus_amount", String.valueOf(BonusEffectsManager.manager.getPlayerActivedBonus(player).size()),
                     "next_level", String.valueOf(bonusTotemData.getLevel() + 1),
                     "next_price", bonusTotemData.getUpgradePriceName(player),
                     "next_description", bonusTotemData.getDescription(bonusTotemData.getLevel() + 1),

@@ -23,7 +23,9 @@ conditions: []
 disappear: false
 bonus-effects:
   enabled: true
+  default-level: 1
   max-level: 5
+  # group: 'advanced'
 
   1:
     range: 16
@@ -32,9 +34,9 @@ bonus-effects:
     price:
       material: diamond
       amount: 64
-      placeholder: '钻石 x{amount}'
+      placeholder: 'Diamond x{amount}'
 
-    description: '10 血 + 每秒给一个苹果'
+    description: '10 Health + Each 3 seconds give 1 apple'
 
     effects:
       enabled: true
@@ -47,12 +49,12 @@ bonus-effects:
     apply-actions:
       1:
         type: message
-        message: "§aLv1 图腾激活！"
+        message: "§aLv1 Totem start！"
 
     remove-actions:
       1:
         type: message
-        message: "§cLv1 图腾失效！"
+        message: "§cLv1 Totem end！"
 
     circle-actions:
       1:
@@ -68,9 +70,9 @@ bonus-effects:
     price:
       material: diamond
       amount: 128
-      placeholder: '钻石 x{amount}'
+      placeholder: 'Diamond x{amount}'
 
-    description: '15 血 + 每2秒给一个金苹果'
+    description: '15 Health + Each 2 seconds give 1 golden apple'
 
     effects:
       enabled: true
@@ -84,12 +86,12 @@ bonus-effects:
     apply-actions:
       1:
         type: message
-        message: "§bLv2 图腾增强！"
+        message: "§bLv2 Totem start！"
 
     remove-actions:
       1:
         type: message
-        message: "§7Lv2 效果结束！"
+        message: "§7Lv2 Totem ended！"
 
     circle-actions:
       1:
@@ -105,9 +107,9 @@ bonus-effects:
     price:
       material: diamond
       amount: 256
-      placeholder: '钻石 x{amount}'
+      placeholder: 'Diamond x{amount}'
 
-    description: '20 血 + 每秒给一个附魔金苹果'
+    description: '20 Health + Each 1 second give 1 enchanted golden apple'
 
     effects:
       enabled: true
@@ -120,12 +122,12 @@ bonus-effects:
     apply-actions:
       1:
         type: message
-        message: "§6Lv3 终极图腾启动！"
+        message: "§6Lv3 Ultimate Totem Start！"
 
     remove-actions:
       1:
         type: message
-        message: "§8终极效果消失！"
+        message: "§8Ultimate Totem ended！"
 
     circle-actions:
       1:

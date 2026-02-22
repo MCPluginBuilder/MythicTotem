@@ -3,6 +3,7 @@ package cn.superiormc.mythictotem.managers;
 import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.objects.ObjectTotem;
 import cn.superiormc.mythictotem.objects.checks.ObjectPriceCheck;
+import cn.superiormc.mythictotem.objects.effect.EffectUtil;
 import cn.superiormc.mythictotem.objects.singlethings.BonusTotemData;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -45,7 +46,7 @@ public class BonusEffectsManager {
                 uuid
         );
 
-        totemMap.computeIfAbsent(chunk, k -> new ArrayList<>()).add(data);
+        totemMap.computeIfAbsent(chunk, k -> new TreeSet<>()).add(data);
 
         saveToChunkPDC(chunk);
     }
@@ -55,7 +56,7 @@ public class BonusEffectsManager {
         for (World world : Bukkit.getWorlds()) {
             for (Chunk chunk : world.getLoadedChunks()) {
                 chunks.add(chunk);
-                handleChunkLoad(chunk);
+                processChunk(chunk);
             }
         }
         for (Chunk chunk : totemMap.keySet()) {
@@ -75,9 +76,10 @@ public class BonusEffectsManager {
         int radius = ConfigManager.configManager.getInt("bonus-effects.check-radius", 10);
         int chunkRadius = (int) Math.ceil(radius / 16.0);
 
-        Map<Location, BonusTotemData> active = playerActive.computeIfAbsent(player.getUniqueId(), k -> new HashMap<>());
+        Map<Location, BonusTotemData> active = playerActive.computeIfAbsent(player.getUniqueId(), k -> new LinkedHashMap<>());
 
         Set<Location> nowInRange = new HashSet<>();
+        Set<String> nowTotemID = new HashSet<>();
 
         for (int dx = -chunkRadius; dx <= chunkRadius; dx++) {
             for (int dz = -chunkRadius; dz <= chunkRadius; dz++) {
@@ -112,11 +114,16 @@ public class BonusEffectsManager {
                         }
 
                         if (!active.containsKey(totemData.location)) {
-                            active.put(totemData.location, totemData);
-                            applyBonus(player, totemData);
+                            int limit = EffectUtil.getMaxEffectsAmount(player, totemData);
+                            if (active.size() < limit && (ConfigManager.configManager.getBoolean("bonus-effects.limit.same-totem-only-active-once", true) &&
+                                    !nowTotemID.contains(totemData.totemId))) {
+                                active.put(totemData.location, totemData);
+                                applyBonus(player, totemData);
+                            }
                         } else {
                             circleBonus(player, totemData);
                         }
+                        nowTotemID.add(totemData.totemId);
                     }
                 }
             }
@@ -141,7 +148,7 @@ public class BonusEffectsManager {
         playerActive.remove(player.getUniqueId());
     }
 
-    public void handleChunkLoad(Chunk chunk) {
+    private void processChunk(Chunk chunk) {
         if (totemMap.containsKey(chunk)) {
             return;
         }
@@ -157,10 +164,14 @@ public class BonusEffectsManager {
 
         for (String entry : entries) {
             String[] parts = entry.split(";;");
-            if (parts.length != 6) continue;
+            if (parts.length != 6) {
+                continue;
+            }
 
             Location loc = stringToLoc(chunk.getWorld(), parts[0]);
-            if (loc == null) continue;
+            if (loc == null) {
+                continue;
+            }
 
             int level = Integer.parseInt(parts[1]);
             long time = Long.parseLong(parts[2]);

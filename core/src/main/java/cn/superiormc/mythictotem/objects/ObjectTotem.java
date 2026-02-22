@@ -54,7 +54,7 @@ public class ObjectTotem {
         this.totemCondition = new ObjectCondition(section.getConfigurationSection("conditions"));
         this.totemCheckMode = section.getString("mode", "VERTICAL").toUpperCase();
         this.totemCoreBlocks = section.getStringList("core-blocks");
-        this.totemBonusEffects = ConfigManager.configManager.getBoolean("bonus-effects.enabled", false) && section.getBoolean("bonus-effects.enabled");
+        this.totemBonusEffects = !MythicTotem.isFolia && ConfigManager.configManager.getBoolean("bonus-effects.enabled", false) && section.getBoolean("bonus-effects.enabled");
         this.totemSection = section;
         ConfigurationSection totemLayoutsExplainConfig = section.getConfigurationSection("explains");
         if (totemLayoutsExplainConfig == null) {
