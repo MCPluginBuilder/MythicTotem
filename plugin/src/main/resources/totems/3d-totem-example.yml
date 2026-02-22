@@ -22,7 +22,7 @@ actions:
 conditions: []
 disappear: false
 bonus-effects:
-  enabled: true
+  enabled: false
   default-level: 1
   max-level: 5
   # group: 'advanced'

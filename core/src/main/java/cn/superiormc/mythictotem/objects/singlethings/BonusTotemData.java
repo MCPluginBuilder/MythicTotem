@@ -76,7 +76,7 @@ public class BonusTotemData extends AbstractThingData implements Comparable<Bonu
 
     public int getMaxLevel() {
         if (totem == null) {
-            return -1;
+            return Integer.MAX_VALUE;
         }
         return totem.getSection().getInt("bonus-effects.max-level", 1);
     }

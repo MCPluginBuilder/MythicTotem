@@ -388,11 +388,11 @@ public class BonusEffectsManager {
 
         ObjectPriceCheck priceCheck = data.getUpgradePrice(player);
 
-        if (!priceCheck.CheckPrice(false, null)) {
+        if (!priceCheck.checkPrice(false, null)) {
             LanguageManager.languageManager.sendStringText(player, "bonus-gui-upgrade-failed");
             return false;
         }
-        priceCheck.CheckPrice(true, null);
+        priceCheck.checkPrice(true, null);
         Collection<Chunk> chunks = new ArrayList<>();
         for (Collection<BonusTotemData> tempVal1 : totemMap.values()) {
             for (BonusTotemData tempVal2 : tempVal1) {

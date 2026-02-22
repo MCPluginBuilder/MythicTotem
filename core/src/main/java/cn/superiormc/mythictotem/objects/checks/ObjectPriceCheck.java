@@ -1,5 +1,6 @@
 package cn.superiormc.mythictotem.objects.checks;
 
+import cn.superiormc.mythictotem.MythicTotem;
 import cn.superiormc.mythictotem.hooks.ItemPriceUtil;
 import cn.superiormc.mythictotem.managers.ConfigManager;
 import cn.superiormc.mythictotem.managers.ErrorManager;
@@ -55,9 +56,13 @@ public class ObjectPriceCheck {
         }
     }
 
-    public boolean CheckPrice(boolean take, ItemStack keyItems) {
+    public boolean checkPrice(boolean take, ItemStack keyItems) {
         if (ConfigManager.configManager.getBoolean("debug", false)) {
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §aKey Item: " + keyItems + "!");
+        }
+        if (MythicTotem.freeVersion) {
+            ErrorManager.errorManager.sendErrorMessage("§cError: Free version can not use price feature. This price check is skipped.");
+            return false;
         }
         boolean priceBoolean = false;
         switch (type) {

@@ -105,6 +105,7 @@ bonus-effects:
       material: EMERALD_BLOCK
       name: '&cUpgrade'
       lore:
+        - '&cPREMIUM VERSION ONLY'
         - '&7Upgrade Bonus:'
         - '&7{next_description}'
         - '&7Next Level: {next_level}'

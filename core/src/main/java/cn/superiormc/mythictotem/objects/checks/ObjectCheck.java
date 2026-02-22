@@ -148,8 +148,7 @@ public class ObjectCheck {
                 continue;
             }
             // 价格
-            boolean usePrice = !MythicTotem.freeVersion &&
-                    singleTotem.getTotem().getSection().contains("prices");
+            boolean usePrice = singleTotem.getTotem().getSection().contains("prices");
             if (usePrice && player != null) {
                 if (ConfigManager.configManager.getBoolean("debug", false)) {
                     TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §eChecking " + singleTotem.getTotem().getTotemID() +
@@ -166,7 +165,7 @@ public class ObjectCheck {
                     if (ConfigManager.configManager.getBoolean("debug", false)) {
                         TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §eItem: " + item + "!");
                     }
-                    if (!priceManager.CheckPrice(false, item)) {
+                    if (!priceManager.checkPrice(false, item)) {
                         if (ConfigManager.configManager.getBoolean("debug", false)) {
                             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §eSkipped " + singleTotem.getTotem().getTotemID() +
                                     " because prices not meet!");
@@ -619,7 +618,7 @@ public class ObjectCheck {
                             Collection<Entity> needRemoveEntities) {
         ConfigManager.configManager.getCheckingBlock.remove(block);
         ConfigurationSection priceSection = singleTotem.getTotem().getSection().getConfigurationSection("prices");
-        if (!MythicTotem.freeVersion && player != null && priceSection != null) {
+        if (player != null && priceSection != null) {
             for (String singleSection : priceSection.getKeys(false)) {
                 ObjectPriceCheck priceManager = new ObjectPriceCheck(singleTotem.getTotem().getSection().getConfigurationSection("prices." + singleSection),
                         player,
@@ -627,7 +626,7 @@ public class ObjectCheck {
                 if (!singleTotem.getTotem().getKeyMode()) {
                     item = null;
                 }
-                priceManager.CheckPrice(true, item);
+                priceManager.checkPrice(true, item);
             }
         }
         SchedulerUtil.runSync(() -> {
