@@ -60,7 +60,7 @@ public class ObjectPriceCheck {
         if (ConfigManager.configManager.getBoolean("debug", false)) {
             TextUtil.sendMessage(null, TextUtil.pluginPrefix() + " §aKey Item: " + keyItems + "!");
         }
-        if (MythicTotem.freeVersion) {
+        if (MythicTotem.freeVersion && !type.equals("free")) {
             ErrorManager.errorManager.sendErrorMessage("§cError: Free version can not use price feature. This price check is skipped.");
             return false;
         }

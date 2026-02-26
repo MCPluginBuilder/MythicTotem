@@ -2,6 +2,7 @@ package cn.superiormc.mythictotem.objects.conditions;
 
 import cn.superiormc.mythictotem.managers.ErrorManager;
 import cn.superiormc.mythictotem.objects.singlethings.AbstractThingData;
+import cn.superiormc.mythictotem.utils.MathUtil;
 import org.bukkit.entity.Player;
 
 public class ConditionPlaceholder extends AbstractCheckCondition {
@@ -18,15 +19,15 @@ public class ConditionPlaceholder extends AbstractCheckCondition {
         try {
             switch (singleCondition.getString("rule")) {
                 case ">=":
-                    return Double.parseDouble(placeholder) >= Double.parseDouble(value);
+                    return MathUtil.doCalculate(placeholder) >= MathUtil.doCalculate(value);
                 case ">":
-                    return Double.parseDouble(placeholder) > Double.parseDouble(value);
+                    return MathUtil.doCalculate(placeholder) > MathUtil.doCalculate(value);
                 case "=":
-                    return Double.parseDouble(placeholder) == Double.parseDouble(value);
+                    return MathUtil.doCalculate(placeholder) == MathUtil.doCalculate(value);
                 case "<":
-                    return Double.parseDouble(placeholder) < Double.parseDouble(value);
+                    return MathUtil.doCalculate(placeholder) < MathUtil.doCalculate(value);
                 case "<=":
-                    return Double.parseDouble(placeholder) <= Double.parseDouble(value);
+                    return MathUtil.doCalculate(placeholder) <= MathUtil.doCalculate(value);
                 case "==":
                     return placeholder.equals(value);
                 case "!=":

@@ -387,6 +387,9 @@ public class BonusEffectsManager {
         }
 
         ObjectPriceCheck priceCheck = data.getUpgradePrice(player);
+        if (priceCheck == null) {
+            return false;
+        }
 
         if (!priceCheck.checkPrice(false, null)) {
             LanguageManager.languageManager.sendStringText(player, "bonus-gui-upgrade-failed");

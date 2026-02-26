@@ -87,6 +87,9 @@ public class BonusTotemData extends AbstractThingData implements Comparable<Bonu
         }
 
         ConfigurationSection priceSection = section.getConfigurationSection("price");
+        if (priceSection == null) {
+            return null;
+        }
 
         return new ObjectPriceCheck(
                 priceSection,

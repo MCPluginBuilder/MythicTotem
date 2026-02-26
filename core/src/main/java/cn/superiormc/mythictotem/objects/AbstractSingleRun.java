@@ -81,7 +81,7 @@ public abstract class AbstractSingleRun {
                     "next_level", String.valueOf(bonusTotemData.getLevel() + 1),
                     "next_price", bonusTotemData.getUpgradePriceName(player),
                     "next_description", bonusTotemData.getDescription(bonusTotemData.getLevel() + 1),
-                    "next_price_amount", String.valueOf(bonusTotemData.getUpgradePrice(player).getCost()));
+                    "next_price_amount", bonusTotemData.getUpgradePrice(player) == null ? "0" : String.valueOf(bonusTotemData.getUpgradePrice(player).getCost()));
         }
         if (player != null) {
             content = TextUtil.withPAPI(content, player);

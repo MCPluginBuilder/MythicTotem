@@ -57,7 +57,7 @@ public class TotemInfoGUI extends InvGUI {
                 "bonus_amount", String.valueOf(BonusEffectsManager.manager.getPlayerActivedBonus(player).size()),
                 "next_level", String.valueOf(data.getLevel() + 1),
                 "next_price", data.getUpgradePriceName(player),
-                "next_price_amount", String.valueOf(data.getUpgradePrice(player).getCost()),
+                "next_price_amount", data.getUpgradePrice(player) == null ? "0" : String.valueOf(data.getUpgradePrice(player).getCost()),
                 "next_description", data.getDescription(data.getLevel() + 1)};
         ConfigurationSection totemInfoSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.totem-info-item");
         if (totemInfoSection != null) {
@@ -67,21 +67,26 @@ public class TotemInfoGUI extends InvGUI {
                 inv.setItem(totemInfoSlot, totemInfoItem);
             }
         }
-        ConfigurationSection totemUpgradeSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.totem-upgrade-item");
-        if (totemUpgradeSection != null && data.getLevel() < data.getMaxLevel()) {
-            totemUpgradeSlot = totemUpgradeSection.getInt("slot", 15);
-            if (totemUpgradeSection.getBoolean("enabled", true) && totemUpgradeSlot >= 0) {
-                ItemStack totemUpgradeItem = BuildItem.buildItemStack(player, totemUpgradeSection, totemUpgradeSection.getInt("amount", 1), tempVal1);
-                inv.setItem(totemUpgradeSlot, totemUpgradeItem);
+        boolean displayUpgradeOrMax = data.getLevel() < data.getMaxLevel() && data.getUpgradePrice(player) != null;
+        if (displayUpgradeOrMax) {
+            ConfigurationSection totemUpgradeSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.totem-upgrade-item");
+            if (totemUpgradeSection != null) {
+                totemUpgradeSlot = totemUpgradeSection.getInt("slot", 15);
+                if (totemUpgradeSection.getBoolean("enabled", true) && totemUpgradeSlot >= 0) {
+                    ItemStack totemUpgradeItem = BuildItem.buildItemStack(player, totemUpgradeSection, totemUpgradeSection.getInt("amount", 1), tempVal1);
+                    inv.setItem(totemUpgradeSlot, totemUpgradeItem);
+                }
+            }
+        } else {
+            ConfigurationSection totemMaxUpgradeSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.totem-max-upgrade-item");
+            if (totemMaxUpgradeSection != null) {
+                if (totemMaxUpgradeSection.getBoolean("enabled", true) && totemUpgradeSlot >= 0) {
+                    ItemStack totemUpgradeItem = BuildItem.buildItemStack(player, totemMaxUpgradeSection, totemMaxUpgradeSection.getInt("amount", 1));
+                    inv.setItem(totemUpgradeSlot, totemUpgradeItem);
+                }
             }
         }
-        ConfigurationSection totemMaxUpgradeSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.totem-max-upgrade-item");
-        if (totemMaxUpgradeSection != null && data.getLevel() >= data.getMaxLevel()) {
-            if (totemMaxUpgradeSection.getBoolean("enabled", true) && totemUpgradeSlot >= 0) {
-                ItemStack totemUpgradeItem = BuildItem.buildItemStack(player, totemMaxUpgradeSection, totemMaxUpgradeSection.getInt("amount", 1));
-                inv.setItem(totemUpgradeSlot, totemUpgradeItem);
-            }
-        }
+
         ConfigurationSection customItemSection = ConfigManager.configManager.getConfigurationSection("bonus-effects.gui.custom-item");
         if (customItemSection != null) {
             for (String key : customItemSection.getKeys(false)){
